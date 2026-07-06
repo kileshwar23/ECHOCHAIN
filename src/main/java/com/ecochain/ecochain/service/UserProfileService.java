@@ -4,6 +4,8 @@ import com.ecochain.ecochain.dto.ChangePasswordRequest;
 import com.ecochain.ecochain.dto.UserProfileDto;
 import com.ecochain.ecochain.entity.User;
 import com.ecochain.ecochain.entity.User.Role;
+import com.ecochain.ecochain.exception.BadRequestException;
+import com.ecochain.ecochain.exception.DuplicateResourceException;
 import com.ecochain.ecochain.exception.ResourceNotFoundException;
 import com.ecochain.ecochain.repository.ComplaintRepository;
 import com.ecochain.ecochain.repository.PickupRequestRepository;
@@ -36,7 +38,7 @@ public class UserProfileService {
 
         // If email is changing, ensure new email isn't taken
         if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already in use: " + dto.getEmail());
+            throw new DuplicateResourceException("Email already in use: " + dto.getEmail());
         }
 
         user.setName(dto.getName());
@@ -51,7 +53,7 @@ public class UserProfileService {
         User user = findByEmail(email);
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Current password is incorrect");
+            throw new BadRequestException("Current password is incorrect");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

@@ -5,6 +5,7 @@ import com.ecochain.ecochain.dto.LoginRequest;
 import com.ecochain.ecochain.dto.RegisterRequest;
 import com.ecochain.ecochain.entity.User;
 import com.ecochain.ecochain.entity.User.Role;
+import com.ecochain.ecochain.exception.DuplicateResourceException;
 import com.ecochain.ecochain.repository.UserRepository;
 import com.ecochain.ecochain.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already registered: " + request.getEmail());
+            throw new DuplicateResourceException("Email already registered: " + request.getEmail());
         }
 
         User user = User.builder()

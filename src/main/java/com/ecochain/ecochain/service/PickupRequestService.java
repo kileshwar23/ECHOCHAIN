@@ -5,6 +5,7 @@ import com.ecochain.ecochain.entity.PickupRequest;
 import com.ecochain.ecochain.entity.PickupRequest.RequestStatus;
 import com.ecochain.ecochain.entity.Schedule;
 import com.ecochain.ecochain.entity.User;
+import com.ecochain.ecochain.exception.BadRequestException;
 import com.ecochain.ecochain.exception.ResourceNotFoundException;
 import com.ecochain.ecochain.repository.PickupRequestRepository;
 import com.ecochain.ecochain.repository.ScheduleRepository;
@@ -53,7 +54,7 @@ public class PickupRequestService {
         PickupRequest request = getRequestOwnedByCitizen(requestId, citizenEmail);
 
         if (request.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalArgumentException("Only PENDING requests can be cancelled");
+            throw new BadRequestException("Only PENDING requests can be cancelled. Current status: " + request.getStatus());
         }
         request.setStatus(RequestStatus.CANCELLED);
         return toDto(pickupRequestRepository.save(request));
@@ -99,7 +100,7 @@ public class PickupRequestService {
                 .orElseThrow(() -> new ResourceNotFoundException("PickupRequest", requestId));
 
         if (!request.getCitizen().getEmail().equals(citizenEmail)) {
-            throw new IllegalArgumentException("You do not own this request");
+            throw new BadRequestException("You do not own this request");
         }
         return request;
     }
